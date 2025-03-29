@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Computer } from './computer.model';
 import { v4 as uuid } from 'uuid';
 import { ComputerDto } from './dto/computer.dto';
 import { GetComputersFilterDto } from './dto/get-computers-filter.dto';
+import { UpdateComputerDto } from './dto/update-computer.dto';
 
 @Injectable()
 export class ComputersService {
@@ -33,9 +34,15 @@ export class ComputersService {
     }
     return computers;
   }
-//   getComputerById(id: string): Computer {
-//     return this.computers.find((computer) => computer.id === id);
-//   }
+  getComputerById(id: string): Computer {
+    const found = this.computers.find((computer) => computer.id === id);
+
+    if (!found) {
+      throw new NotFoundException(`Computer with ID "${id}" not found`);
+    }
+
+    return found;
+  }
 
   createComputer(computerDto: ComputerDto): Computer {
     const { cpu, ram, ssd, hdd, room, building } = computerDto;
@@ -53,6 +60,21 @@ export class ComputersService {
   }
 
   deleteComputer(id: string): void {
-    this.computers = this.computers.filter((computer) => computer.id !== id);
+    const found = this.getComputerById(id);
+    this.computers = this.computers.filter(
+      (computer) => computer.id !== found.id,
+    );
+  }
+
+  updateComputer(id: string, updateComputerDto: UpdateComputerDto): Computer {
+    const computer = this.getComputerById(id);
+    const { cpu, ram, ssd, hdd, room, building } = updateComputerDto;
+    if (cpu) computer.cpu = cpu;
+    if (ram) computer.ram = ram;
+    if (ssd) computer.ssd = ssd;
+    if (hdd) computer.hdd = hdd;
+    if (room) computer.room = room;
+    if (building) computer.building = building;
+    return computer;
   }
 }

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { ComputersService } from './computers.service';
 import { Computer } from './computer.model';
 import { ComputerDto } from './dto/computer.dto';
 import { GetComputersFilterDto } from './dto/get-computers-filter.dto';
+import { UpdateComputerDto } from './dto/update-computer.dto';
 
 @Controller('computers')
 export class ComputersController {
@@ -25,10 +27,10 @@ export class ComputersController {
     }
   }
 
-//   @Get(':/id')
-//   getComputerById(@Param('id') id: string): Computer {
-//     return this.computersService.getComputerById(id);
-//   }
+  @Get('/:id')
+  getComputerById(@Param('id') id: string): Computer {
+    return this.computersService.getComputerById(id);
+  }
 
   @Post()
   createComputer(@Body() computerDto: ComputerDto): Computer {
@@ -38,5 +40,13 @@ export class ComputersController {
   @Delete('/:id')
   deleteComputer(@Param('id') id: string): void {
     this.computersService.deleteComputer(id);
+  }
+
+  @Patch('/:id')
+  updateComputer(
+    @Param('id') id: string,
+    @Body() updateComputerDto: UpdateComputerDto,
+  ): Computer {
+    return this.computersService.updateComputer(id, updateComputerDto);
   }
 }
