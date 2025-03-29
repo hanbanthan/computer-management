@@ -3,13 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
 import { ComputersService } from './computers.service';
-import { Computer } from './computer.model';
 import { ComputerDto } from './dto/computer.dto';
 import { GetComputersFilterDto } from './dto/get-computers-filter.dto';
 import { UpdateComputerDto } from './dto/update-computer.dto';
@@ -19,34 +19,69 @@ export class ComputersController {
   constructor(private readonly computersService: ComputersService) {}
 
   @Get()
-  getComputers(@Query() filterDto: GetComputersFilterDto): Computer[] {
+  async getComputers(@Query() filterDto: GetComputersFilterDto) {
     if (Object.keys(filterDto).length) {
-      return this.computersService.getComputersWithFilters(filterDto);
+      const computers =
+        await this.computersService.getComputersWithFilters(filterDto);
+      return {
+        message: 'List of all computers with filters retrieved successfully',
+        computers: computers,
+      };
     } else {
-      return this.computersService.getAllComputers();
+      const computers = await this.computersService.getAllComputers();
+      return {
+        message: 'List of all computers retrieved successfully',
+        computers: computers,
+      };
     }
   }
 
   @Get('/:id')
-  getComputerById(@Param('id') id: string): Computer {
-    return this.computersService.getComputerById(id);
+  async getComputerById(@Param('id') id: string) {
+    const computer = await this.computersService.getComputerById(id);
+    if (computer) {
+      return {
+        message: 'Computer retrieved successfully',
+        computer: computer,
+      };
+    }
+    throw new NotFoundException('Computer not found');
   }
 
   @Post()
-  createComputer(@Body() computerDto: ComputerDto): Computer {
-    return this.computersService.createComputer(computerDto);
+  async createComputer(@Body() computerDto: ComputerDto) {
+    const computer = await this.computersService.createComputer(computerDto);
+    if (computer) {
+      return {
+        message: 'Computer created successfully',
+        computer: computer,
+      };
+    }
+    throw new NotFoundException('Computer creation unsuccessful');
   }
 
   @Delete('/:id')
-  deleteComputer(@Param('id') id: string): void {
-    this.computersService.deleteComputer(id);
+  async deleteComputer(@Param('id') id: string) {
+    const result = await this.computersService.deleteComputer(id);
+
+    if (result === null) throw new NotFoundException('Computer not found');
+
+    return { message: 'Computer deleted successfully' };
   }
 
   @Patch('/:id')
   updateComputer(
     @Param('id') id: string,
     @Body() updateComputerDto: UpdateComputerDto,
-  ): Computer {
-    return this.computersService.updateComputer(id, updateComputerDto);
+  ){
+    const updatedComputer = this.computersService.updateComputer(
+      id,
+      updateComputerDto,
+    );
+
+    if (updatedComputer === null)
+      throw new NotFoundException('Computer not found');
+
+    return { message: 'Computer updated successfully' };
   }
 }
