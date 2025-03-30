@@ -8,13 +8,16 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ComputersService } from './computers.service';
 import { ComputerDto } from './dto/computer.dto';
 import { GetComputersFilterDto } from './dto/get-computers-filter.dto';
 import { UpdateComputerDto } from './dto/update-computer.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('computers')
+@UseGuards(AuthGuard())
 export class ComputersController {
   constructor(private readonly computersService: ComputersService) {}
 
@@ -73,7 +76,7 @@ export class ComputersController {
   updateComputer(
     @Param('id') id: string,
     @Body() updateComputerDto: UpdateComputerDto,
-  ){
+  ) {
     const updatedComputer = this.computersService.updateComputer(
       id,
       updateComputerDto,

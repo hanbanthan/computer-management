@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ComputerDto } from './dto/computer.dto';
 import { GetComputersFilterDto } from './dto/get-computers-filter.dto';
 import { UpdateComputerDto } from './dto/update-computer.dto';
-import { ComputersRepository } from './computer.repository';
+import { ComputersRepository } from './computers.repository';
 import { Computer } from './computer.entity';
 
 @Injectable()
