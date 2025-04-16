@@ -8,22 +8,22 @@ import { configValidationSchema } from './config.schema';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`.env.stage.dev`],
+      envFilePath: [`.env.stage.${process.env.STAGE}`],
       validationSchema: configValidationSchema,
     }),
     ComputersModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configSevice: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         autoLoadEntities: true,
         synchronize: true,
-        host: configSevice.get('DB_HOST'),
-        port: configSevice.get('DB_PORT'),
-        username: configSevice.get('DB_USERNAME'),
-        password: configSevice.get('DB_PASSWORD'),
-        database: configSevice.get('DB_DATABASE'),
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE'),
       }),
     }),
     AuthModule,
